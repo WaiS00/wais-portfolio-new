@@ -1,13 +1,829 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Google AI Studio App</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chin Wai Siong | Software Engineer Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --green: #22c55e;
+            --dark-green: #14532d;
+            --black: #000000;
+        }
 
+        body {
+            background-color: var(--black);
+            color: var(--green);
+            font-family: 'JetBrains Mono', monospace;
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        /* CRT Effect */
+        .crt-effect {
+            position: relative;
+        }
+
+        .crt-effect::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 9999;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        .crt-effect::after {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: rgba(18, 16, 16, 0.1);
+            opacity: 0;
+            z-index: 9998;
+            pointer-events: none;
+            animation: flicker 0.15s infinite;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.27861; }
+            5% { opacity: 0.34769; }
+            10% { opacity: 0.23604; }
+            15% { opacity: 0.90626; }
+            20% { opacity: 0.18128; }
+            25% { opacity: 0.83891; }
+            30% { opacity: 0.65583; }
+            35% { opacity: 0.57807; }
+            40% { opacity: 0.26559; }
+            45% { opacity: 0.84693; }
+            50% { opacity: 0.96019; }
+            55% { opacity: 0.08523; }
+            60% { opacity: 0.71056; }
+            65% { opacity: 0.73437; }
+            70% { opacity: 0.28574; }
+            75% { opacity: 0.963; }
+            80% { opacity: 0.22608; }
+            85% { opacity: 0.09829; }
+            90% { opacity: 0.45463; }
+            95% { opacity: 0.94652; }
+            100% { opacity: 0.34225; }
+        }
+
+        .scanline {
+            width: 100%;
+            height: 100px;
+            z-index: 9997;
+            background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(255, 255, 255, 0.2) 10%, rgba(0, 0, 0, 0.1) 100%);
+            opacity: 0.1;
+            position: fixed;
+            bottom: 100%;
+            animation: scanline 10s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes scanline {
+            0% { bottom: 100%; }
+            80% { bottom: 100%; }
+            100% { bottom: 0%; }
+        }
+
+        .glitch {
+            position: relative;
+        }
+
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+        }
+
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 #ff00c1;
+            clip: rect(44px, 450px, 56px, 0);
+            animation: glitch-anim 5s infinite linear alternate-reverse;
+        }
+
+        .glitch::after {
+            left: -2px;
+            text-shadow: -2px 0 #00fff9, 2px 2px #ff00c1;
+            animation: glitch-anim2 1s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% { clip: rect(31px, 9999px, 94px, 0); transform: skew(0.85deg); }
+            5% { clip: rect(70px, 9999px, 71px, 0); transform: skew(0.05deg); }
+            10% { clip: rect(10px, 9999px, 20px, 0); transform: skew(0.35deg); }
+            100% { clip: rect(40px, 9999px, 20px, 0); transform: skew(0.2deg); }
+        }
+
+        @keyframes glitch-anim2 {
+            0% { clip: rect(65px, 9999px, 100px, 0); transform: skew(0.5deg); }
+            100% { clip: rect(85px, 9999px, 15px, 0); transform: skew(0.5deg); }
+        }
+
+        .matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .section-content {
+            display: none;
+        }
+
+        .section-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .nav-link.active {
+            border-bottom: 2px solid var(--green);
+            color: white;
+            background-color: rgba(34, 197, 94, 0.1);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #14532d;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #22c55e;
+        }
+
+        .mobile-menu {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .desktop-nav {
+                display: none;
+            }
+            .mobile-menu-btn {
+                display: block;
+            }
+            .mobile-menu.active {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+<body class="crt-effect">
+    <canvas id="matrix" class="matrix-canvas"></canvas>
+    <div class="scanline"></div>
+
+    <!-- Boot Sequence -->
+    <div id="boot-sequence" class="fixed inset-0 bg-black z-[10000] flex items-center justify-center p-4">
+        <div class="max-w-md w-full space-y-2 text-sm md:text-base">
+            <div id="boot-text"></div>
+            <div id="boot-progress-container" class="hidden mt-4">
+                <div class="h-1 bg-green-900 w-full overflow-hidden rounded">
+                    <div id="boot-progress" class="h-full bg-green-500 w-0 transition-all duration-1000"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div id="main-app" class="hidden min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="fixed top-0 left-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-green-900/50">
+            <div class="max-w-6xl mx-auto px-4 flex items-center justify-between h-16">
+                <div class="flex items-center gap-2 cursor-pointer" onclick="showSection('home')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-500 animate-pulse"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg>
+                    <span class="text-lg md:text-xl font-bold tracking-tighter glitch" data-text="CHIN_WAI_SIONG">CHIN_WAI_SIONG</span>
+                </div>
+
+                <!-- Desktop Nav -->
+                <nav class="hidden md:flex items-center h-full">
+                    <button onclick="showSection('home')" class="nav-link h-full px-4 flex items-center uppercase tracking-widest text-xs font-bold transition-all active" data-section="home">Home</button>
+                    <button onclick="showSection('about')" class="nav-link h-full px-4 flex items-center uppercase tracking-widest text-xs font-bold transition-all" data-section="about">About</button>
+                    <button onclick="showSection('experience')" class="nav-link h-full px-4 flex items-center uppercase tracking-widest text-xs font-bold transition-all" data-section="experience">Experience</button>
+                    <button onclick="showSection('skills')" class="nav-link h-full px-4 flex items-center uppercase tracking-widest text-xs font-bold transition-all" data-section="skills">Skills</button>
+                    <button onclick="showSection('projects')" class="nav-link h-full px-4 flex items-center uppercase tracking-widest text-xs font-bold transition-all" data-section="projects">Projects</button>
+                    <button onclick="showSection('education')" class="nav-link h-full px-4 flex items-center uppercase tracking-widest text-xs font-bold transition-all" data-section="education">Education</button>
+                    <button onclick="showSection('languages')" class="nav-link h-full px-4 flex items-center uppercase tracking-widest text-xs font-bold transition-all" data-section="languages">Languages</button>
+                </nav>
+
+                <!-- Mobile Menu Button -->
+                <button onclick="toggleMobileMenu()" class="md:hidden text-green-500 p-2">
+                    <svg id="menu-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </button>
+
+                <div class="hidden md:flex items-center gap-4">
+                    <a href="https://github.com" target="_blank" class="hover:text-white transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path><path d="M9 18c-4.51 2-5-2-7-2"></path></svg></a>
+                    <a href="https://linkedin.com/in/waisiong00" target="_blank" class="hover:text-white transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg></a>
+                </div>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="mobile-menu md:hidden flex-col bg-black border-b border-green-900/50 p-4 space-y-4">
+                <button onclick="showSection('home')" class="text-left uppercase tracking-widest text-sm font-bold py-2 border-b border-green-900/20">Home</button>
+                <button onclick="showSection('about')" class="text-left uppercase tracking-widest text-sm font-bold py-2 border-b border-green-900/20">About</button>
+                <button onclick="showSection('experience')" class="text-left uppercase tracking-widest text-sm font-bold py-2 border-b border-green-900/20">Experience</button>
+                <button onclick="showSection('skills')" class="text-left uppercase tracking-widest text-sm font-bold py-2 border-b border-green-900/20">Skills</button>
+                <button onclick="showSection('projects')" class="text-left uppercase tracking-widest text-sm font-bold py-2 border-b border-green-900/20">Projects</button>
+                <button onclick="showSection('education')" class="text-left uppercase tracking-widest text-sm font-bold py-2 border-b border-green-900/20">Education</button>
+                <button onclick="showSection('languages')" class="text-left uppercase tracking-widest text-sm font-bold py-2 border-b border-green-900/20">Languages</button>
+                <div class="flex gap-6 pt-2">
+                    <a href="https://github.com" target="_blank" class="text-green-500"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path><path d="M9 18c-4.51 2-5-2-7-2"></path></svg></a>
+                    <a href="https://linkedin.com/in/waisiong00" target="_blank" class="text-green-500"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg></a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow pt-24 pb-12 px-4 max-w-6xl mx-auto w-full relative z-10">
+            <!-- Home Section -->
+            <section id="home" class="section-content active min-h-[70vh] flex flex-col justify-center">
+                <div class="space-y-6">
+                    <div class="inline-block px-3 py-1 border border-green-500/30 bg-green-500/5 rounded text-xs uppercase tracking-widest">
+                        System Status: Online
+                    </div>
+                    <h1 class="text-4xl md:text-7xl font-bold tracking-tighter leading-none">
+                        SOFTWARE <br />
+                        <span class="text-white">ENGINEER</span>
+                    </h1>
+                    <p class="text-base md:text-xl text-green-800 max-w-2xl leading-relaxed">
+                        Specializing in building high-performance distributed systems, 
+                        neural architectures, and secure web applications. 
+                        Passionate about clean code and system optimization.
+                    </p>
+                    <div class="flex flex-wrap gap-4 pt-4">
+                        <button onclick="showSection('projects')" class="px-6 md:px-8 py-3 bg-green-500 text-black font-bold uppercase tracking-widest hover:bg-white transition-all flex items-center gap-2 text-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+                            View Projects
+                        </button>
+                        <button onclick="showSection('about')" class="px-6 md:px-8 py-3 border border-green-500 text-green-500 font-bold uppercase tracking-widest hover:bg-green-500/10 transition-all flex items-center gap-2 text-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            About Me
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- About Section -->
+            <section id="about" class="section-content space-y-8">
+                <div class="flex items-center gap-4 border-b border-green-900 pb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    <h2 class="text-2xl md:text-3xl font-bold uppercase tracking-tighter">Identity_Profile</h2>
+                </div>
+                <div class="grid md:grid-cols-2 gap-12">
+                    <div class="space-y-6 text-green-400 leading-relaxed text-sm md:text-base">
+                        <p>I am a software engineer with a deep fascination for how complex systems interact. My journey in technology started with a curiosity about security and evolved into a passion for building robust, scalable software.</p>
+                        <p>I believe in "Coding Best Practices" not just as a set of rules, but as a philosophy of craftsmanship. Clean code, comprehensive testing, and thoughtful architecture are the foundations of everything I build.</p>
+                        <div class="p-4 border border-green-900 bg-green-900/10 rounded-lg space-y-2">
+                            <div class="flex items-center gap-2 text-green-500 font-bold">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                <span>Security First Mindset</span>
+                            </div>
+                            <p class="text-xs text-green-700">Every line of code is written with security and performance in mind. I prioritize zero-trust architectures and data integrity.</p>
+                        </div>
+                    </div>
+                    <div class="relative group">
+                        <div class="absolute -inset-1 bg-green-500 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+                        <div class="relative bg-black border border-green-900 p-6 md:p-8 rounded-lg space-y-4">
+                            <h3 class="text-lg md:text-xl font-bold text-white uppercase tracking-widest">System_Specs</h3>
+                            <div class="space-y-3">
+                                <div class="flex justify-between border-b border-green-900/30 pb-2">
+                                    <span class="text-green-800 text-xs uppercase">Location</span>
+                                    <span class="text-green-500 text-sm">Kuala Lumpur, MY</span>
+                                </div>
+                                <div class="flex justify-between border-b border-green-900/30 pb-2">
+                                    <span class="text-green-800 text-xs uppercase">Focus</span>
+                                    <span class="text-green-500 text-sm text-right">Technical Solutions / Software Eng</span>
+                                </div>
+                                <div class="flex justify-between border-b border-green-900/30 pb-2">
+                                    <span class="text-green-800 text-xs uppercase">Experience</span>
+                                    <span class="text-green-500 text-sm">5+ Years</span>
+                                </div>
+                                <div class="flex justify-between border-b border-green-900/30 pb-2">
+                                    <span class="text-green-800 text-xs uppercase">Status</span>
+                                    <span class="text-green-500 text-sm">Active / Online</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Certificates -->
+                <div class="pt-8">
+                    <h3 class="text-xl font-bold text-white uppercase tracking-widest mb-4">Certifications_Log</h3>
+                    <div id="certs-list" class="grid md:grid-cols-2 gap-4">
+                        <!-- Injected by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Experience Section -->
+            <section id="experience" class="section-content space-y-8">
+                <div class="flex items-center gap-4 border-b border-green-900 pb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                    <h2 class="text-2xl md:text-3xl font-bold uppercase tracking-tighter">Work_History</h2>
+                </div>
+                <div id="experience-list" class="space-y-12">
+                    <!-- Injected by JS -->
+                </div>
+            </section>
+
+            <!-- Skills Section -->
+            <section id="skills" class="section-content space-y-8">
+                <div class="flex items-center gap-4 border-b border-green-900 pb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="15" x2="23" y2="15"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="15" x2="4" y2="15"></line></svg>
+                    <h2 class="text-2xl md:text-3xl font-bold uppercase tracking-tighter">Tech_Stack</h2>
+                </div>
+                <div id="skills-grid" class="grid md:grid-cols-3 gap-6">
+                    <!-- Injected by JS -->
+                </div>
+                <div class="pt-8">
+                    <div class="p-6 border border-dashed border-green-900 rounded-lg flex flex-col md:flex-row items-center gap-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-yellow-500"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                        <div class="space-y-2 text-center md:text-left">
+                            <h4 class="text-xl font-bold text-white">Continuous Learning</h4>
+                            <p class="text-sm text-green-700">Currently exploring: Rust Systems Programming, WebAssembly Optimization, and Zero-Knowledge Proofs.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Projects Section -->
+            <section id="projects" class="section-content space-y-8">
+                <div class="flex items-center gap-4 border-b border-green-900 pb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                    <h2 class="text-2xl md:text-3xl font-bold uppercase tracking-tighter">Active_Deployments</h2>
+                </div>
+                <div id="projects-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Injected by JS -->
+                </div>
+            </section>
+
+            <!-- Education Section -->
+            <section id="education" class="section-content space-y-8">
+                <div class="flex items-center gap-4 border-b border-green-900 pb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+                    <h2 class="text-2xl md:text-3xl font-bold uppercase tracking-tighter">Academic_Records</h2>
+                </div>
+                <div id="education-list" class="space-y-8">
+                    <!-- Injected by JS -->
+                </div>
+            </section>
+
+            <!-- Languages Section -->
+            <section id="languages" class="section-content space-y-8">
+                <div class="flex items-center gap-4 border-b border-green-900 pb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    <h2 class="text-2xl md:text-3xl font-bold uppercase tracking-tighter">Communication_Protocols</h2>
+                </div>
+                <div id="languages-grid" class="grid md:grid-cols-2 gap-6">
+                    <!-- Injected by JS -->
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="border-t border-green-900/50 py-8 mt-12 bg-black/50 backdrop-blur-sm">
+            <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="text-[10px] md:text-xs text-green-900 uppercase tracking-widest text-center md:text-left">
+                    &copy; 2026 CHIN_WAI_SIONG // ALL RIGHTS RESERVED
+                </div>
+                <div class="flex flex-wrap justify-center items-center gap-4 md:gap-6">
+                    <a href="mailto:chinwaisiong@hotmail.com" class="flex items-center gap-2 text-[10px] md:text-xs hover:text-white transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                        CONTACT_ME
+                    </a>
+                    <div class="flex items-center gap-2 text-[10px] md:text-xs text-green-900">
+                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        SYSTEM_STABLE
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // --- Data ---
+        const PROJECTS = [
+            {
+                title: "Digital Customer Onboarding Platform",
+                description: "Led the development of a secure onboarding system for major banks including Bank Islam and Alliance Bank.",
+                tech: ["PHP", "JavaScript", "MySQL", "SIT/UAT"],
+                github: "https://github.com"
+            },
+            {
+                title: "Enterprise Claim & Recruitment Systems",
+                description: "Architected and developed internal enterprise tools for claim processing and recruitment management.",
+                tech: ["Svelte", "Python", "Django", "PostgreSQL"],
+                github: "https://github.com"
+            },
+            {
+                title: "IoT Mobile Design Guidelines",
+                description: "Researched and designed comprehensive guidelines for IoT-enabled mobile applications.",
+                tech: ["IoT", "Mobile Design", "R&D"],
+                link: "#"
+            }
+        ];
+
+        const EXPERIENCES = [
+            {
+                company: "TDCX / Google Malaysia",
+                role: "Technical Solutions Architect",
+                period: "03/2025 - Present",
+                description: [
+                    "Specializing in Google Ads, GTM, GMC, and GA4 implementations.",
+                    "Providing technical consulting and troubleshooting for high-value advertisers.",
+                    "Assisting clients with conversion tracking, remarketing, and tag configuration via GTM/JS.",
+                    "Delivering detailed technical documentation and debugging insights to stakeholders."
+                ]
+            },
+            {
+                company: "Juris Technologies (Juristech)",
+                role: "Technical Lead / Specialist Software Engineer",
+                period: "04/2024 - 03/2025",
+                description: [
+                    "Tech Lead for Bank Islam Retail and Non-retail projects.",
+                    "Managed development, SIT, and UAT environments for Digital Customer Onboarding platforms.",
+                    "Developed integrations with CBS (Silverlake), Infoconnect, and internal JOM systems.",
+                    "Performed unit testing and defect fixing across multiple banking projects."
+                ]
+            },
+            {
+                company: "Fusionex Group",
+                role: "Software Engineer (Solution Consultant)",
+                period: "02/2023 - 03/2024",
+                description: [
+                    "Designed prototypes and gathered functional requirements from stakeholders.",
+                    "Developed frontend and backend components for recruitment and analytics projects.",
+                    "Implemented automated testing using Selenium and Python/Django.",
+                    "Conducted security and load testing using OWASP ZAP and Locust."
+                ]
+            },
+            {
+                company: "Fusionex Group",
+                role: "Software Engineer Intern",
+                period: "12/2022 - 02/2023",
+                description: [
+                    "Supported the development team in building enterprise solutions.",
+                    "Assisted in unit testing and bug fixing for core modules.",
+                    "Gained hands-on experience with enterprise-level software development lifecycles."
+                ]
+            },
+            {
+                company: "Human-Machine Collaboration Lab (Sunway HOME Lab)",
+                role: "Undergraduate Researcher",
+                period: "09/2021 - 03/2023",
+                description: [
+                    "Helped lecturers conduct R&D on several IT-related topics.",
+                    "Guided newcomers on journal writing and research methodologies.",
+                    "Research Area: Design Guideline for IoT mobile applications."
+                ]
+            },
+            {
+                company: "Silverlake Axis, SMC",
+                role: "Information Technology / Microservices Intern",
+                period: "12/2020 - 02/2021",
+                description: [
+                    "Worked with Java Springboot and Swagger API for microservices development.",
+                    "Utilized Docker, Kubernetes, and Docker Swarm for container orchestration.",
+                    "Deployed and managed services on Google Cloud Platform (Kubernetes Engine)."
+                ]
+            }
+        ];
+
+        const SKILLS = {
+            google: ["Google Ads", "GTM", "GA4", "GMC", "Tag Assistant"],
+            frontend: ["Svelte", "React", "JavaScript", "HTML/CSS", "Bootstrap", "AJAX"],
+            backend: ["Python", "Django", "PHP", "Java Springboot", "Node.js"],
+            devops: ["Docker", "Kubernetes", "Git", "Gitlab", "Azure DevOps"],
+            testing: ["Selenium", "JMeter", "Locust", "OWASP ZAP"]
+        };
+
+        const EDUCATION = [
+            {
+                degree: "Bachelor of Software Engineering (Hons)",
+                school: "Sunway University / Lancaster University, UK",
+                period: "04/2021 - 04/2023",
+                details: "First Class Honours, CGPA: 3.65. ACE Scholarship holder."
+            },
+            {
+                degree: "Diploma in Information Technology",
+                school: "Sunway College",
+                period: "03/2019 - 03/2021",
+                details: "Distinction, CGPA: 3.85. Entrance Scholarship holder."
+            }
+        ];
+
+        const CERTIFICATES = [
+            "Google Ads - Measurement Certification (2025)",
+            "Google AI-Powered Shopping Ads Certification (2025)",
+            "Google Ads Search Certification (2025)",
+            "Google Ads Display Certification (2025)",
+            "Advance and Continuing Excellence (ACE) Scholarship (2022)",
+            "Certification of Participation for Make It Challenge (MIC) 2021",
+            "Google Analytics Individual Qualification (2021)",
+            "Google Creative Certification Exam (2021)",
+            "Google Mobile Experience Certification (2021)",
+            "Google Python Crash Course (2021)",
+            "UiPath AI Computer Vision (2021)",
+            "UiPath Get Started with RPA Development (2021)",
+            "UiPath Orchestrator Personal Workspaces (2021)",
+            "Gitlab 101 & 201 Certified (2021)",
+            "Complete Certification of Introduction to Big Data (UCSD) (2021)"
+        ];
+
+        const LANGUAGES = [
+            { name: "English", level: 5 },
+            { name: "Mandarin", level: 5 },
+            { name: "Cantonese", level: 5 },
+            { name: "Malay", level: 4 }
+        ];
+
+        // --- Matrix Background ---
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$+-*/=%\"'#&_(),.;:?!\\|{}<>[]^~";
+        const fontSize = 14;
+        let columns = canvas.width / fontSize;
+        let drops = [];
+
+        function initDrops() {
+            columns = canvas.width / fontSize;
+            drops = [];
+            for (let i = 0; i < columns; i++) {
+                drops[i] = 1;
+            }
+        }
+        initDrops();
+        window.addEventListener('resize', initDrops);
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#0f0';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        setInterval(drawMatrix, 33);
+
+        // --- Typewriter Effect ---
+        function typeWriter(elementId, text, delay = 50, callback) {
+            const element = document.getElementById(elementId);
+            let i = 0;
+            const p = document.createElement('p');
+            element.appendChild(p);
+            
+            function type() {
+                if (i < text.length) {
+                    p.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, delay);
+                } else if (callback) {
+                    callback();
+                }
+            }
+            type();
+        }
+
+        // --- Boot Sequence ---
+        window.addEventListener('DOMContentLoaded', () => {
+            const bootText = document.getElementById('boot-text');
+            const bootSequence = document.getElementById('boot-sequence');
+            const mainApp = document.getElementById('main-app');
+            const progressContainer = document.getElementById('boot-progress-container');
+            const progressBar = document.getElementById('boot-progress');
+
+            typeWriter('boot-text', '> INITIALIZING SYSTEM BOOT...', 30, () => {
+                typeWriter('boot-text', '> LOADING KERNEL MODULES...', 20, () => {
+                    typeWriter('boot-text', '> ESTABLISHING SECURE CONNECTION...', 40, () => {
+                        typeWriter('boot-text', '> ACCESS GRANTED: CHIN_WAI_SIONG_V2.0', 50, () => {
+                            progressContainer.classList.remove('hidden');
+                            setTimeout(() => {
+                                progressBar.style.width = '100%';
+                                setTimeout(() => {
+                                    bootSequence.style.opacity = '0';
+                                    bootSequence.style.transition = 'opacity 0.5s ease';
+                                    setTimeout(() => {
+                                        bootSequence.classList.add('hidden');
+                                        mainApp.classList.remove('hidden');
+                                        renderDynamicContent();
+                                    }, 500);
+                                }, 1000);
+                            }, 100);
+                        });
+                    });
+                });
+            });
+        });
+
+        // --- Navigation ---
+        function showSection(sectionId) {
+            // Update Nav Links (Desktop)
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.getAttribute('data-section') === sectionId) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+
+            // Update Mobile Menu Links
+            document.querySelectorAll('#mobile-menu button').forEach(btn => {
+                const btnText = btn.innerText.toLowerCase();
+                if (btnText === sectionId || (sectionId === 'home' && btnText === 'home')) {
+                    btn.classList.add('text-white', 'bg-green-900/20');
+                } else {
+                    btn.classList.remove('text-white', 'bg-green-900/20');
+                }
+            });
+
+            // Update Sections
+            document.querySelectorAll('.section-content').forEach(section => {
+                if (section.id === sectionId) {
+                    section.classList.add('active');
+                    section.style.display = 'block';
+                } else {
+                    section.classList.remove('active');
+                    section.style.display = 'none';
+                }
+            });
+
+            // Close mobile menu
+            document.getElementById('mobile-menu').classList.remove('active');
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('active');
+        }
+
+        // --- Render Content ---
+        function renderDynamicContent() {
+            // Certificates
+            const certsList = document.getElementById('certs-list');
+            CERTIFICATES.forEach(cert => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center gap-3 p-3 border border-green-900/50 bg-green-900/5 rounded';
+                div.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-700"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    <span class="text-[10px] md:text-xs text-green-400">${cert}</span>
+                `;
+                certsList.appendChild(div);
+            });
+
+            // Experience
+            const expList = document.getElementById('experience-list');
+            EXPERIENCES.forEach(exp => {
+                const div = document.createElement('div');
+                div.className = 'relative pl-8 border-l border-green-900';
+                div.innerHTML = `
+                    <div class="absolute left-[-5px] top-0 w-[9px] h-[9px] bg-green-500 rounded-full shadow-[0_0_10px_#0f0]"></div>
+                    <div class="space-y-2">
+                        <div class="flex flex-wrap justify-between items-start gap-2">
+                            <div>
+                                <h3 class="text-lg md:text-xl font-bold text-white">${exp.role}</h3>
+                                <p class="text-green-500 font-bold text-sm md:text-base">${exp.company}</p>
+                            </div>
+                            <span class="text-[10px] bg-green-900/30 px-2 py-1 rounded border border-green-900">${exp.period}</span>
+                        </div>
+                        <ul class="space-y-2 pt-2">
+                            ${exp.description.map(item => `
+                                <li class="flex gap-2 text-xs md:text-sm text-green-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 text-green-600 mt-0.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                    <span>${item}</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+                expList.appendChild(div);
+            });
+
+            // Skills
+            const skillsGrid = document.getElementById('skills-grid');
+            Object.entries(SKILLS).forEach(([category, items]) => {
+                const div = document.createElement('div');
+                div.className = 'border border-green-900 bg-green-900/5 p-6 rounded-lg space-y-4 hover:border-green-500/50 transition-colors';
+                div.innerHTML = `
+                    <h3 class="text-base md:text-lg font-bold text-white uppercase tracking-widest border-b border-green-900 pb-2">${category}</h3>
+                    <div class="flex flex-wrap gap-2">
+                        ${items.map(skill => `
+                            <span class="text-[10px] px-2 py-1 bg-green-500/10 border border-green-500/20 rounded hover:bg-green-500 hover:text-black transition-all cursor-default">
+                                ${skill}
+                            </span>
+                        `).join('')}
+                    </div>
+                `;
+                skillsGrid.appendChild(div);
+            });
+
+            // Projects
+            const projectsGrid = document.getElementById('projects-grid');
+            PROJECTS.forEach(project => {
+                const div = document.createElement('div');
+                div.className = 'group relative border border-green-900 bg-black p-6 rounded-lg flex flex-col h-full hover:border-green-500 transition-all';
+                div.innerHTML = `
+                    <div class="space-y-4 flex-grow">
+                        <div class="flex justify-between items-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-800 group-hover:text-green-500 transition-colors"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+                            <div class="flex gap-3">
+                                ${project.github ? `<a href="${project.github}" target="_blank" class="text-green-800 hover:text-white transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path><path d="M9 18c-4.51 2-5-2-7-2"></path></svg></a>` : ''}
+                                ${project.link ? `<a href="${project.link}" target="_blank" class="text-green-800 hover:text-white transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a>` : ''}
+                            </div>
+                        </div>
+                        <h3 class="text-lg md:text-xl font-bold text-white group-hover:text-green-400 transition-colors">${project.title}</h3>
+                        <p class="text-xs md:text-sm text-green-600 leading-relaxed">${project.description}</p>
+                        <div class="flex flex-wrap gap-2 pt-2">
+                            ${project.tech.map(t => `<span class="text-[10px] uppercase font-bold tracking-tighter text-green-800">#${t}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+                projectsGrid.appendChild(div);
+            });
+
+            // Education
+            const eduList = document.getElementById('education-list');
+            EDUCATION.forEach(edu => {
+                const div = document.createElement('div');
+                div.className = 'border border-green-900/50 bg-green-900/5 p-6 rounded-lg space-y-2';
+                div.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <h3 class="text-lg md:text-xl font-bold text-white">${edu.degree}</h3>
+                        <span class="text-[10px] bg-green-900/30 px-2 py-1 rounded border border-green-900">${edu.period}</span>
+                    </div>
+                    <p class="text-green-500 font-bold text-sm md:text-base">${edu.school}</p>
+                    <p class="text-xs md:text-sm text-green-700">${edu.details}</p>
+                `;
+                eduList.appendChild(div);
+            });
+
+            // Languages
+            const langGrid = document.getElementById('languages-grid');
+            LANGUAGES.forEach(lang => {
+                const div = document.createElement('div');
+                div.className = 'border border-green-900 bg-green-900/5 p-6 rounded-lg flex justify-between items-center';
+                div.innerHTML = `
+                    <span class="text-base md:text-xl font-bold text-white uppercase tracking-widest">${lang.name}</span>
+                    <div class="flex gap-1">
+                        ${[1, 2, 3, 4, 5].map(dot => `
+                            <div class="w-2 md:w-3 h-2 md:h-3 rounded-full ${dot <= lang.level ? 'bg-green-500 shadow-[0_0_8px_#0f0]' : 'bg-green-900/30'}"></div>
+                        `).join('')}
+                    </div>
+                `;
+                langGrid.appendChild(div);
+            });
+        }
+    </script>
+</body>
+</html>
